@@ -1,0 +1,77 @@
+@host = http://localhost:4567
+
+### 1. Listar todos los juegos (200, 3 juegos)
+GET {{host}}/api/juegos
+
+### 2. Juego inexistente (404)
+GET {{host}}/api/juegos/99
+
+### 3. Crear un juego nuevo (201, id 4, retirado false, copiasVendidas 0)
+POST {{host}}/api/juegos
+Content-Type: application/json
+
+{
+  "titulo": "Hades",
+  "desarrollador": "Supergiant Games",
+  "anio": 2020,
+  "genero": "Roguelike",
+  "precio": 24.99
+}
+
+### 4. Comprar un juego retirado (409)
+POST {{host}}/api/compras
+Content-Type: application/json
+
+{
+  "juegoId": 3,
+  "usuario": "Germán Alonso",
+  "fecha": "2026-11-12T00:00:00"
+}
+
+### 5. Comprar un juego inexistente (404)
+POST {{host}}/api/compras
+Content-Type: application/json
+
+{
+  "juegoId": 99,
+  "usuario": "Germán Alonso",
+  "fecha": "2026-11-12T00:00:00"
+}
+
+### 6. Comprar un juego disponible (201, código C002, juego 1 con copiasVendidas 2)
+POST {{host}}/api/compras
+Content-Type: application/json
+
+{
+  "juegoId": 1,
+  "usuario": "Germán Alonso",
+  "fecha": "2026-11-12T00:00:00"
+}
+
+### 7. Comprar otra vez el mismo juego con el mismo usuario (409)
+POST {{host}}/api/compras
+Content-Type: application/json
+
+{
+  "juegoId": 1,
+  "usuario": "Germán Alonso",
+  "fecha": "2026-11-12T00:00:00"
+}
+
+### 8. Compras de un juego inexistente (404)
+GET {{host}}/api/compras/Juego%20Inexistente
+
+### 9. Reembolsar la compra C001 (200, juego 2 con copiasVendidas 0)
+PUT {{host}}/api/compras/C001/reembolsar
+
+### 10. Reembolsar otra vez la compra C001 (409)
+PUT {{host}}/api/compras/C001/reembolsar
+
+### 11. Borrar un juego con compra activa (409)
+DELETE {{host}}/api/juegos/1
+
+### 12. Borrar un juego sin compras activas (200)
+DELETE {{host}}/api/juegos/4
+
+### 13. Borrar un juego por título sin compras activas (200)
+DELETE {{host}}/api/juegos/titulo/Celeste

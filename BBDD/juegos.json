@@ -1,0 +1,32 @@
+[
+    {
+        "id": 1,
+        "titulo": "Stardew Valley",
+        "desarrollador": "ConcernedApe",
+        "anio": 2016,
+        "genero": "Simulación",
+        "precio": 14.99,
+        "retirado": false,
+        "copiasVendidas": 1
+    },
+    {
+        "id": 2,
+        "titulo": "Hollow Knight",
+        "desarrollador": "Team Cherry",
+        "anio": 2017,
+        "genero": "Metroidvania",
+        "precio": 14.99,
+        "retirado": false,
+        "copiasVendidas": 1
+    },
+    {
+        "id": 3,
+        "titulo": "Celeste",
+        "desarrollador": "Maddy Makes Games",
+        "anio": 2018,
+        "genero": "Plataformas",
+        "precio": 19.99,
+        "retirado": true,
+        "copiasVendidas": 0
+    }
+]
