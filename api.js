@@ -152,6 +152,24 @@ app.delete('/api/juegos/titulo/:titulo', (req, res) => {
     res.json(confirmMsgDelete);
 });
 
+// --- --- Compras --- ---
+
+// --- Metodos GET ---
+app.get('/api/compras', (req, res) => {
+    res.json(compras);
+});
+
+app.get('/api/compras/:titulo', (req, res) => {
+    const titulo = String(req.params.titulo);
+    const compra = compras.find(c => c.titulo === titulo);
+    
+    if (!titulo) {
+        res.status(404).json(errorMsgNotFound);
+    }
+    
+    res.json(compra);
+});
+
 // Listen server
 app.listen(port, () => {
     console.log(pc.yellow(pc.bold(`Servidor escuhando en: ${port}`)));
