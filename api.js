@@ -37,6 +37,13 @@ function juegoTieneCompras(juegoId) {
     return false;
 }
 
+function compraReembolsada(estado) {
+    if (estado === 'Activa') {
+        return false;
+    }
+    return true;
+}
+
 
 // Logger
 app.use((req, res, next) => {
@@ -217,6 +224,40 @@ app.post('/api/compras', (req, res) => {
     fs.writeFileSync(pathJuegos, JSON.stringify(juegos, null, 4));
     
     res.status(201).json(compraNueva);
+});
+
+// --- Metodos PUT ---
+app.put('/api/compras/:codigo/reembolsar', (req, res) => {
+    const codigo = String(req.params.codigo);
+    const indexCompra = compras.findIndex(c => c.codigo === codigo);
+    const indexJuego = juegos.findIndex(j => j.id === compras[indexCompra].juegoId);
+    
+    if (indexCompra === -1) {
+        return res.status(404).json(errorMsgNotFound);
+    }
+    if (compraReembolsada(compras[indexCompra].estado)) {
+        return res.status(409).json(errorMsgConflict);
+    }
+    compras[indexCompra] = {
+        codigo: compras[indexCompra].codigo,
+        juegoId: compras[indexCompra].juegoId,
+        usuario: compras[indexCompra].usuario,
+        fecha: compras[indexCompra].fecha,
+        estado: "Reembolsada"
+    };
+    juegos[indexJuego] = {
+        id: juegos[indexJuego].id,
+        titulo: juegos[indexJuego].titulo,
+        desarrollador: juegos[indexJuego].desarrollador,
+        anio: juegos[indexJuego].anio,
+        genero: juegos[indexJuego].genero,
+        precio: juegos[indexJuego].precio,
+        retirado: juegos[indexJuego].retirado,
+        copiasVendidas: juegos[indexJuego].copiasVendidas - 1
+    };
+    fs.writeFileSync(pathCompras, JSON.stringify(compras, null, 4));
+    fs.writeFileSync(pathJuegos, JSON.stringify(juegos, null, 4));
+    res.end();
 });
 
 // Listen server
