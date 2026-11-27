@@ -16,8 +16,24 @@ const pathJuegos = path.join(__dirname, 'BBDD', 'juegos.json');
 const app = express();
 const port = 4567;
 const errorMsgNotFound = { error: 'Elemento no encontrado' };
-
+const errorMsgConflict = { error: 'Operacion no se puede realizar por un conflicto' };
+const confirmMsgDelete = { mensaje: 'Elemento eliminado correctamente' };
 app.use(express.json());
+
+// Fuciones
+function juegoTieneCompras(juegoId) {
+    const compra = compras.find(c => c.juegoId === juegoId);
+    
+    if (!compra) {
+        return false;
+    }
+    
+    if (compra.estado === 'Activa') {
+        return true;
+    }
+    
+    return false;
+}
 
 // Logger
 app.use((req, res, next) => {
@@ -98,6 +114,42 @@ app.put('/api/juegos/:id', (req, res) => {
     };
     
     fs.writeFileSync(pathJuegos, JSON.stringify(juegos, null, 4));
+    res.json(juegos[index]);
+});
+
+// --- Metodos DELETE ---
+app.delete('/api/juegos/:id', (req, res) => {
+    const id = Number(req.params.id);
+    const index = juegos.findIndex(j => j.id === id);
+    
+    if (index === -1) {
+        return res.status(404).json(errorMsgNotFound);
+    }
+    if (juegoTieneCompras(id)) {
+        return res.status(409).json(errorMsgConflict);
+    }
+    
+    juegos.splice(index, 1);
+    fs.writeFileSync(pathJuegos, JSON.stringify(juegos, null, 4));
+    
+    res.json(confirmMsgDelete);
+});
+
+app.delete('/api/juegos/titulo/:titulo', (req, res) => {
+    const titulo = String(req.params.titulo);
+    const index = juegos.findIndex(j => j.titulo === titulo);
+    
+    if (index === -1) {
+        return res.status(404).json(errorMsgNotFound);
+    }
+    const id = juegos[index].id;
+    if (juegoTieneCompras(id)) {
+        return res.status(409).json(errorMsgConflict);
+    }
+    
+    juegos.splice(index, 1);
+    fs.writeFileSync(pathJuegos, JSON.stringify(juegos, null, 4));
+    res.json(confirmMsgDelete);
 });
 
 // Listen server

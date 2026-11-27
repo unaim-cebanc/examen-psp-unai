@@ -68,10 +68,23 @@ PUT {{host}}/api/compras/C001/reembolsar
 PUT {{host}}/api/compras/C001/reembolsar
 
 ### 11. Borrar un juego con compra activa (409)
-DELETE {{host}}/api/juegos/1
+DELETE {{host}}/api/juegos/2
 
 ### 12. Borrar un juego sin compras activas (200)
 DELETE {{host}}/api/juegos/4
 
 ### 13. Borrar un juego por título sin compras activas (200)
 DELETE {{host}}/api/juegos/titulo/Celeste
+
+### 14. Modificar un juego
+PUT {{host}}/api/juegos/1
+Content-Type: application/json
+
+{
+  "id": 1,
+  "titulo": "Germán Alonso",
+  "desarrollador": "Germán Alonso"
+}
+
+### 13. Borrar un juego por título con compras activas (409)
+DELETE {{host}}/api/juegos/titulo/Hollow%Knight
