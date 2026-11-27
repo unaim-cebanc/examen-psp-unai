@@ -45,7 +45,7 @@ app.get('/api/juegos', (req, res) => {
 });
 
 app.get('/api/juegos/:id', (req, res) => {
-    const id = req.params.id;
+    const id = Number(req.params.id);
     const juego = juegos.find(j => j.id === id);
     
     if (!juego) {
@@ -75,6 +75,29 @@ app.post('/api/juegos', (req, res) => {
     fs.writeFileSync(pathJuegos, JSON.stringify(juegos, null, 4));
     
     res.status(201).json(nuevoJuego);
+});
+
+// --- Metodos PUT ---
+app.put('/api/juegos/:id', (req, res) => {
+    const id = Number(req.params.id);
+    const index = juegos.findIndex(j => j.id === id);
+    
+    if (index === -1) {
+        return res.status(404).json(errorMsgNotFound);
+    }
+    
+    juegos[index] = {
+        id: juegos[index].id,
+        titulo: req.body.titulo || juegos[index].titulo,
+        desarrollador: req.body.desarrollador || juegos[index].desarrollador,
+        anio: req.body.anio || juegos[index].anio,
+        genero: req.body.genero || juegos[index].genero,
+        precio: req.body.precio || juegos[index].precio,
+        retirado: juegos[index].retirado,
+        copiasVendidas: juegos[index].copiasVendidas
+    };
+    
+    fs.writeFileSync(pathJuegos, JSON.stringify(juegos, null, 4));
 });
 
 // Listen server
