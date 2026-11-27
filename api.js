@@ -10,6 +10,7 @@ const compras = require('./BBDD/compras.json');
 const pathCompras = path.join(__dirname, 'BBDD', 'compras.json');
 
 const juegos = require('./BBDD/juegos.json');
+const { json } = require('node:stream/consumers');
 const pathJuegos = path.join(__dirname, 'BBDD', 'juegos.json');
 
 // Config servidor
@@ -35,6 +36,7 @@ function juegoTieneCompras(juegoId) {
     
     return false;
 }
+
 
 // Logger
 app.use((req, res, next) => {
@@ -167,8 +169,8 @@ app.get('/api/compras/:titulo', (req, res) => {
     if (index === -1) {
         return res.status(404).json(errorMsgNotFound);
     }
-    const id = juegos[index].id;
-    if (!juegoTieneCompras(id)) {
+
+    if (!juegoTieneCompras(juegos[index].id)) {
         return res.status(404).json(errorMsgJuegoSinCompras);
     }
     
@@ -176,7 +178,46 @@ app.get('/api/compras/:titulo', (req, res) => {
     res.json(compra);
 });
 
-
+// --- Metodos POST ---
+app.post('/api/compras', (req, res) => {
+    const juegoId = Number(req.body.juegoId);
+    const index = juegos.findIndex(j => j.id === juegoId);
+    
+    if (index === -1) {
+        return res.status(404).json(errorMsgNotFound);
+    }
+    if (juegos[index].retirado) {
+        return res.status(409).json(errorMsgConflict);
+    }
+    if (juegoTieneCompras(juegos[index].id)) {
+        return res.status(409).json(errorMsgConflict);
+    }
+    
+    const compraNueva = {
+        codigo: "C" + String(compras.length + 1).padStart(3, '0'),
+        juegoId: juegoId,
+        usuario: req.body.usuario,
+        fecha: req.body.fecha,
+        estado: "Activa"
+    };
+    compras.push(compraNueva);
+    
+    juegos[index] = {
+        id: juegos[index].id,
+        titulo: juegos[index].titulo,
+        desarrollador: juegos[index].desarrollador,
+        anio: juegos[index].anio,
+        genero: juegos[index].genero,
+        precio: juegos[index].precio,
+        retirado: juegos[index].retirado,
+        copiasVendidas: juegos[index].copiasVendidas + 1
+    };
+    
+    fs.writeFileSync(pathCompras, JSON.stringify(compras, null, 4));
+    fs.writeFileSync(pathJuegos, JSON.stringify(juegos, null, 4));
+    
+    res.status(201).json(compraNueva);
+});
 
 // Listen server
 app.listen(port, () => {
