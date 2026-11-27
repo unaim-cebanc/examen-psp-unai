@@ -55,6 +55,28 @@ app.get('/api/juegos/:id', (req, res) => {
     res.json(juego);
 });
 
+// --- Metodos POST ---
+app.post('/api/juegos', (req, res) => {
+    const ultimoJuego = juegos.findLast(c => c.id != null);
+    const id = ultimoJuego.id + 1;
+    
+    const nuevoJuego = {
+        id: id,
+        titulo: req.body.titulo,
+        desarrollador: req.body.desarrollador,
+        anio: req.body.anio,
+        genero: req.body.genero, 
+        precio: req.body.precio,
+        retirado: false,
+        copiasVendidas: 0
+    };
+    
+    juegos.push(nuevoJuego);
+    fs.writeFileSync(pathJuegos, JSON.stringify(juegos, null, 4));
+    
+    res.status(201).json(nuevoJuego);
+});
+
 // Listen server
 app.listen(port, () => {
     console.log(pc.yellow(pc.bold(`Servidor escuhando en: ${port}`)));
