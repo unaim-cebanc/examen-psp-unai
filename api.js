@@ -17,6 +17,7 @@ const app = express();
 const port = 4567;
 const errorMsgNotFound = { error: 'Elemento no encontrado' };
 const errorMsgConflict = { error: 'Operacion no se puede realizar por un conflicto' };
+const errorMsgJuegoSinCompras = { error: 'Juego no tiene compras activas' };
 const confirmMsgDelete = { mensaje: 'Elemento eliminado correctamente' };
 app.use(express.json());
 
@@ -161,14 +162,21 @@ app.get('/api/compras', (req, res) => {
 
 app.get('/api/compras/:titulo', (req, res) => {
     const titulo = String(req.params.titulo);
-    const compra = compras.find(c => c.titulo === titulo);
+    const index = juegos.findIndex(j => j.titulo === titulo);
     
-    if (!titulo) {
-        res.status(404).json(errorMsgNotFound);
+    if (index === -1) {
+        return res.status(404).json(errorMsgNotFound);
+    }
+    const id = juegos[index].id;
+    if (!juegoTieneCompras(id)) {
+        return res.status(404).json(errorMsgJuegoSinCompras);
     }
     
+    const compra = compras.find(c => c.juegoId === id);
     res.json(compra);
 });
+
+
 
 // Listen server
 app.listen(port, () => {

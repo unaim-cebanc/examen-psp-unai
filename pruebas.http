@@ -86,5 +86,11 @@ Content-Type: application/json
   "desarrollador": "Germán Alonso"
 }
 
-### 13. Borrar un juego por título con compras activas (409)
+### 15. Borrar un juego por título con compras activas (409)
 DELETE {{host}}/api/juegos/titulo/Hollow%Knight
+
+### 16. Compras de un juego sin compra activa (404)
+GET {{host}}/api/compras/Celeste
+
+### 16. Compras de un juego con compra activa (200)
+GET {{host}}/api/compras/Hollow%20Knight
